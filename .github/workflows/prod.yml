@@ -10,7 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Production
     steps:
-      - run: echo "Deploying to production server..."
+      - run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" &> ~/ssh_key
+          mkdir -p /home/runner/.ssh
+          ls /home/runner/.ssh
+          touch /home/runner/.ssh/known_hosts
+          echo "${{ secrets.KNOWN_HOSTS }}" &> /home/runner/.ssh/known_hosts
+          chmod 700 /home/runner/ssh_key
+          ssh -i ~/ssh_key root@64.227.147.124 -t "cd MERN-todo-monorepo/ && git pull origin mastre && npm --workspace=client run build && pm2 start ecosystem.config.js"
       
 
 # jobs:
